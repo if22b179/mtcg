@@ -1,5 +1,6 @@
 import org.if22b179.apps.mtcg.entity.User;
 import org.if22b179.apps.mtcg.repository.UserRepo;
+import org.if22b179.apps.mtcg.service.UserService;
 import org.if22b179.server.http.HttpContentType;
 import org.if22b179.server.http.HttpMethod;
 import org.if22b179.server.http.Request;
@@ -10,7 +11,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCases {
-
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //                                         Repo Tests
 
     @Test
     void saveUserInDB() {
@@ -24,7 +26,6 @@ public class TestCases {
         assertNotNull(savedUser , "Usser sollte nicht null sein ");
 
     }
-
     @Test
     void delUser(){
         UserRepo userRepo = new UserRepo();
@@ -33,7 +34,6 @@ public class TestCases {
         Optional<User> deletedUser = userRepo.findById("Probe test");
         assertTrue(deletedUser.isEmpty(), "User should be deleted");
     }
-
     @Test
     void updateUser(){
         User user = new User();
@@ -50,5 +50,21 @@ public class TestCases {
         assertNotNull(updatedUser.getImage() , "Image sollte nicht null sein ");
 
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //                               Service Tests
+
+    @Test
+    void serviceCreeateUser(){
+        User user = new User();
+        user.setUsername("Probe");
+        user.setPassword("123");
+        UserRepo userRepo = new UserRepo();
+        UserService userService = new UserService(userRepo);
+        User saved = userService.createUser(user);
+
+        assertNotNull(saved , "Usser sollte nicht null sein ");
+    }
+
 }
 
