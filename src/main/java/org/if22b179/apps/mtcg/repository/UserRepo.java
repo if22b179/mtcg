@@ -19,6 +19,9 @@ public class UserRepo implements CrudRepo<User,String> {
 
     private final String FIND_BY_ID_SQL = "SELECT * FROM UserTable WHERE username = ?";
 
+    private final String UPDATE_SQL = "UPDATE UserTable SET name = ?, bio = ?, image = ? WHERE username = ?";
+
+
 
     @Override
     public User save(User user) {
@@ -33,7 +36,7 @@ public class UserRepo implements CrudRepo<User,String> {
             return user;
         } catch (SQLException e) {
             // THOUGHT: how do i handle exceptions (hint: look at the TaskApp)
-            throw new RuntimeException("Fehler beim Speichern in die DB des Benutzers: " + user.getUsername(), e);
+            throw new RuntimeException("Fehler beim Speichern in der DB des Benutzers: " + user.getUsername(), e);
         }
     }
 
@@ -63,7 +66,24 @@ public class UserRepo implements CrudRepo<User,String> {
 
     @Override
     public User update(User user) {
-        return null;
+        try (
+                Connection con = database.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(UPDATE_SQL)
+        ) {
+            pstmt.setString(1, user.getName());
+            pstmt.setString(2, user.getBio());
+            pstmt.setString(3, user.getImage());
+            pstmt.setString(4, user.getUsername());
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating user failed, no rows affected.");
+            }
+
+            return user;
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Aktualisieren in der DB des Benutzers: " + user.getUsername(), e);
+        }
     }
 
     @Override

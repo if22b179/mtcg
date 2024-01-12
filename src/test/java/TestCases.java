@@ -27,12 +27,28 @@ public class TestCases {
 
     @Test
     void delUser(){
-
         UserRepo userRepo = new UserRepo();
         assertTrue(userRepo.findById("Probe test").isPresent(), "Sollte existieren");
         userRepo.deleteById("Probe test");
         Optional<User> deletedUser = userRepo.findById("Probe test");
         assertTrue(deletedUser.isEmpty(), "User should be deleted");
+    }
+
+    @Test
+    void updateUser(){
+        User user = new User();
+        user.setBio("Probe bio ob es auch funkt");
+        user.setImage("HierSollteEinBildSein");
+        user.setName("Voller Name");
+        user.setUsername("Probe test");
+
+        UserRepo userRepo = new UserRepo();
+        User updatedUser = userRepo.update(user);
+
+        assertNotNull(updatedUser.getBio() , "Bio sollte nicht null sein ");
+        assertNotNull(updatedUser.getName() , "Name sollte nicht null sein ");
+        assertNotNull(updatedUser.getImage() , "Image sollte nicht null sein ");
+
     }
 }
 
