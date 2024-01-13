@@ -1,9 +1,9 @@
+import org.if22b179.apps.mtcg.MtcgApp;
+import org.if22b179.apps.mtcg.controller.Controller;
 import org.if22b179.apps.mtcg.entity.User;
 import org.if22b179.apps.mtcg.repository.UserRepo;
 import org.if22b179.apps.mtcg.service.UserService;
-import org.if22b179.server.http.HttpContentType;
-import org.if22b179.server.http.HttpMethod;
-import org.if22b179.server.http.Request;
+import org.if22b179.server.http.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -11,9 +11,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCases {
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    //                                         Repo Tests
-
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //                                   Repo Tests
+    ///////////////////////////////////////////////////////////////////////////////////////
     @Test
     void saveUserInDB() {
         User user = new User();
@@ -51,9 +51,9 @@ public class TestCases {
 
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
     //                               Service Tests
-
+    ///////////////////////////////////////////////////////////////////////////////////////
     @Test
     void serviceCreeateUser(){
         User user = new User();
@@ -66,5 +66,64 @@ public class TestCases {
         assertNotNull(saved , "Usser sollte nicht null sein ");
     }
 
+    @Test
+    void serviceUpdateUser(){
+        User user = new User();
+        user.setUsername("Probe");
+        user.setBio("iwas");
+        user.setImage("iwas");
+        user.setName("iwas");
+        UserRepo userRepo = new UserRepo();
+        UserService userService = new UserService(userRepo);
+        User saved = userService.updateUser(user);
+
+        assertNotNull(saved , "Usser sollte nicht null sein ");
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //                              Controller Tests
+    ///////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    void controllerCreate(){
+        Request request = new Request();
+        request.setMethod(HttpMethod.POST);
+        request.setRoute("/users");
+        request.setContentType(HttpContentType.APPLICATION_JSON.getMimeType());
+        request.setBody("{\"username\":\"kienboec\", \"password\":\"daniel\"}");
+
+        MtcgApp mtcgApp = new MtcgApp();
+        Response response = mtcgApp.handle(request);
+
+        assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+    }
+
+    @Test
+    void controllerUpdate(){
+        Request request = new Request();
+        request.setMethod(HttpMethod.PUT);
+        request.setRoute("/users");
+        request.setContentType(HttpContentType.APPLICATION_JSON.getMimeType());
+        request.setBody("{\"username\":\"kienboec\",\"bio\":\"alksjdhfkajsdhflkajshdf\", \"image\":\"bild\", \"name\":\"harmbe ja\"}");
+
+        MtcgApp mtcgApp = new MtcgApp();
+        Response response = mtcgApp.handle(request);
+
+        assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+    }
+
+    @Test
+    void conrollerDelete(){
+        Request request = new Request();
+        request.setMethod(HttpMethod.DELETE);
+        request.setRoute("/users/kienboec");
+        request.setContentType(HttpContentType.APPLICATION_JSON.getMimeType());
+
+
+        MtcgApp mtcgApp = new MtcgApp();
+        Response response = mtcgApp.handle(request);
+
+        assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+    }
 }
 

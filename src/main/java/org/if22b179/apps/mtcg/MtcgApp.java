@@ -2,6 +2,9 @@ package org.if22b179.apps.mtcg;
 
 import lombok.Data;
 import org.if22b179.apps.mtcg.controller.Controller;
+import org.if22b179.apps.mtcg.controller.UserController;
+import org.if22b179.apps.mtcg.repository.UserRepo;
+import org.if22b179.apps.mtcg.service.UserService;
 import org.if22b179.server.ServerApplication;
 import org.if22b179.server.http.HttpContentType;
 import org.if22b179.server.http.HttpStatus;
@@ -16,7 +19,7 @@ public class MtcgApp implements ServerApplication {
     private List<Controller> controllers = new ArrayList<>();
 
     public MtcgApp() {
-        //controllers.add();
+        controllers.add(new UserController(new UserService(new UserRepo())));
     }
 
     @Override
