@@ -3,7 +3,7 @@ package org.if22b179.apps.mtcg.service;
 import lombok.Data;
 import org.if22b179.apps.mtcg.entity.User;
 import org.if22b179.apps.mtcg.repository.UserRepo;
-
+import org.mindrot.jbcrypt.BCrypt;
 import java.util.Optional;
 
 @Data
@@ -14,6 +14,9 @@ public class UserService {
     public User createUser(User user) {
         // falls ich noch logik brauche genau hier hin
         if(userRepo.findById(user.getUsername()).isEmpty()){
+            //PW hashen
+            String hashPW = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            user.setPassword(hashPW);
             return userRepo.save(user);
         }
         return user;

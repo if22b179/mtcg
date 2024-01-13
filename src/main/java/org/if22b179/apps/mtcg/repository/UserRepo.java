@@ -21,6 +21,8 @@ public class UserRepo implements CrudRepo<User,String> {
 
     private final String UPDATE_SQL = "UPDATE UserTable SET name = ?, bio = ?, image = ? WHERE username = ?";
 
+    private final String FIND_BY_USERNAME_AND_PASSWORD_SQL = "SELECT username,password FROM UserTable WHERE username = ? AND password = ?";
+
 
 
     @Override
@@ -98,5 +100,29 @@ public class UserRepo implements CrudRepo<User,String> {
             // Handling the exception as suggested in the comment
             throw new RuntimeException("Fehler beim Löschen in der DB des Benutzers: " + username, e);
         }
+    }
+
+    public Optional<User> findByUsernameAndPassword(String username, String password) {
+        try (
+                Connection con = database.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(FIND_BY_USERNAME_AND_PASSWORD_SQL)
+        ) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    // Add more fields here if your User entity has more fields
+                    return Optional.of(user);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim login in der DB", e);
+        }
+
+        return Optional.empty();
     }
 }

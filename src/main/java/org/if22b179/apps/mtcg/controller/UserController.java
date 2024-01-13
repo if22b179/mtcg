@@ -77,12 +77,12 @@ public class UserController extends Controller{
     }
 
     private Response createUser(Request request) {
-        System.out.println("Drinnen in create user");
         try {
             // Deserialisieren des Benutzerobjekts aus dem Anfragekörper
             ObjectMapper objectMapper = new ObjectMapper();
             User user = objectMapper.readValue(request.getBody(), User.class);
             // Erstellen des Benutzers über den UserService
+            if(userService.getUser(user.getUsername()).isPresent()) return status(HttpStatus.BAD_REQUEST,"User exestiert");
             User createdUser = userService.createUser(user);
             if (createdUser != null) {
                 // Erstellen und Zurückgeben einer erfolgreichen Antwort
