@@ -20,5 +20,14 @@ public abstract class Controller {
         return response;
     }
 
+    protected boolean isAuthorized(Request request, String expectedId) {
+        if (request.getAuthorization() == null ) {
+            return false;
+        }
+
+        String username = request.getAuthorization().substring("Bearer ".length(), request.getAuthorization().indexOf("-mtcgToken"));
+        return username.equals(expectedId);
+    }
+
     // THOUGHT: more functionality e.g. ok(), json(), etc
 }
