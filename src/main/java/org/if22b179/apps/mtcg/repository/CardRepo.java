@@ -109,4 +109,20 @@ public class CardRepo implements CrudRepo<Card,String>{
             throw new RuntimeException("Fehler beim Löschen der Karte aus der Datenbank: " + id, e);
         }
     }
+
+    public int getMaxPackageId() {
+        // SQL-Query, um die höchste packageId zu erhalten
+        String sql = "SELECT MAX(package_id) FROM CardTable";
+        try (Connection con = database.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1); // Gibt die höchste packageId zurück
+            } else {
+                return 0; // Falls noch keine packageId vorhanden ist
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Abrufen der maximalen packageId", e);
+        }
+    }
 }

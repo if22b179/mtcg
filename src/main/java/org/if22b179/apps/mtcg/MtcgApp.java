@@ -2,9 +2,12 @@ package org.if22b179.apps.mtcg;
 
 import lombok.Data;
 import org.if22b179.apps.mtcg.controller.Controller;
+import org.if22b179.apps.mtcg.controller.PackageController;
 import org.if22b179.apps.mtcg.controller.SessionController;
 import org.if22b179.apps.mtcg.controller.UserController;
+import org.if22b179.apps.mtcg.repository.CardRepo;
 import org.if22b179.apps.mtcg.repository.UserRepo;
+import org.if22b179.apps.mtcg.service.PackagesService;
 import org.if22b179.apps.mtcg.service.SessionService;
 import org.if22b179.apps.mtcg.service.UserService;
 import org.if22b179.server.ServerApplication;
@@ -21,7 +24,7 @@ public class MtcgApp implements ServerApplication {
     private List<Controller> controllers = new ArrayList<>();
 
     public MtcgApp() {
-        controllers.add(new UserController(new UserService(new UserRepo())));
+        controllers.add(new PackageController(new PackagesService(new CardRepo())));
     }
 
     @Override
