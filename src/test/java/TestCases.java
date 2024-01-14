@@ -1,6 +1,8 @@
 import org.if22b179.apps.mtcg.MtcgApp;
 import org.if22b179.apps.mtcg.controller.Controller;
+import org.if22b179.apps.mtcg.entity.Card;
 import org.if22b179.apps.mtcg.entity.User;
+import org.if22b179.apps.mtcg.repository.CardRepo;
 import org.if22b179.apps.mtcg.repository.UserRepo;
 import org.if22b179.apps.mtcg.service.UserService;
 import org.if22b179.server.http.*;
@@ -124,6 +126,63 @@ public class TestCases {
         Response response = mtcgApp.handle(request);
 
         assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    //                             CardTests
+    ///////////////////////////////////////////////////////////////////
+
+    @Test
+    void cardSave(){
+        Card card = new Card();
+        card.setId("1");
+        card.setName("Probe");
+        card.setDamage(70.0);
+        card.setCardType(Card.CardType.MONSTER);
+        card.setElementType(Card.ElementType.NORMAL);
+        card.setPackageId("iwas");
+
+        CardRepo cardRepo = new CardRepo();
+        Card savedUser = cardRepo.save(card);
+
+        assertNotNull(savedUser , "Usser sollte nicht null sein ");
+
+    }
+
+    @Test
+    void cardFind(){
+
+        CardRepo cardRepo = new CardRepo();
+        Optional<Card> savedUser = cardRepo.findById("1");
+
+        System.out.println(savedUser.toString());
+
+        assertNotNull(savedUser , "Usser sollte nicht null sein ");
+
+    }
+
+    @Test
+    void cardUpdate(){
+
+        CardRepo cardRepo = new CardRepo();
+        Optional<Card> savedUser = cardRepo.findById("1");
+        savedUser.get().setOwnerUsername("admin");
+
+        Card neu = cardRepo.update(savedUser.get());
+        System.out.println(neu.toString());
+
+        assertNotNull(neu , "Usser sollte nicht null sein ");
+
+    }
+
+    @Test
+    void cardDel(){
+
+        CardRepo cardRepo = new CardRepo();
+        cardRepo.deleteById("1");
+        Optional<Card> card = cardRepo.findById("1");
+        assertNull(card, "Usser sollte null sein ");
+
     }
 }
 

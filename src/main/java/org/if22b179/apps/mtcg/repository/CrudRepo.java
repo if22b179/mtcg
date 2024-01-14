@@ -1,6 +1,5 @@
 package org.if22b179.apps.mtcg.repository;
 
-
 import java.util.Optional;
 
 public interface CrudRepo<T, ID> {
