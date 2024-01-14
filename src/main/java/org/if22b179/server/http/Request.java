@@ -19,6 +19,17 @@ public class Request {
     // none, "{ "name": "foo" }"
     private String body;
 
+
+
+    private String authorization;
+
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
+    }
     public String getMethod() {
         return method;
     }

@@ -20,7 +20,7 @@ public class User {
     @JsonProperty("Bio")
     private String bio;
 
-    @JsonProperty("image")
+    @JsonProperty("Image")
     private String image;
 
     @JsonProperty("EloValue")

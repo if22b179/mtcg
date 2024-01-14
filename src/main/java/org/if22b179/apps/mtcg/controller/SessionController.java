@@ -1,10 +1,17 @@
 package org.if22b179.apps.mtcg.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import org.if22b179.apps.mtcg.entity.User;
 import org.if22b179.apps.mtcg.service.SessionService;
 import org.if22b179.server.http.HttpStatus;
 import org.if22b179.server.http.Request;
 import org.if22b179.server.http.Response;
+
+import java.io.IOException;
+
 @Data
 public class SessionController extends Controller{
 
@@ -16,27 +23,31 @@ public class SessionController extends Controller{
 
     @Override
     public Response handle(Request request) {
-       /* if ("POST".equals(request.getMethod())) {
+       if ("POST".equals(request.getMethod())) {
             return login(request);
         } else {
             return status(HttpStatus.BAD_REQUEST, "URL Methode falsch");
         }
     }
 
-    public boolean login(String username, String password) {
-        // Überprüfen der Benutzerdaten
-        User user = userRepo.findByUsernameAndPassword(username, password);
+    public Response login(Request request) {
+        try {
+            // Verwenden des User-Objekts direkt für die Anmeldedaten
+            ObjectMapper objectMapper = new ObjectMapper();
+            User userCredentials = objectMapper.readValue(request.getBody(), User.class);
+            boolean loginSuccess = sessionService.login(userCredentials);
 
-        // Überprüfen, ob ein Benutzer gefunden wurde und das eingegebene Passwort korrekt ist
-        if (user != null && user.getPassword().equals(password)) {
-            return true;
+            if (loginSuccess) {
+                return status(HttpStatus.OK, "Login erfolgreich");
+            } else {
+                return status(HttpStatus.NOT_FOUND, "Login fehlgeschlagen: Benutzername oder Passwort falsch");
+            }
+        } catch (IOException e) {
+            return status(HttpStatus.BAD_REQUEST, "Fehler bei der Verarbeitung der Anfrage: " + e.getMessage());
         }
-
-        return false; // Gibt false zurück, wenn der Benutzer nicht gefunden wurde oder das Passwort falsch ist
-
-        */
-        return null;
     }
 
-
 }
+
+
+

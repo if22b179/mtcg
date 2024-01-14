@@ -102,21 +102,21 @@ public class UserRepo implements CrudRepo<User,String> {
         }
     }
 
-    public Optional<User> findByUsernameAndPassword(String username, String password) {
+    public Optional<User> findByUsernameAndPassword(User user) {
         try (
                 Connection con = database.getConnection();
                 PreparedStatement pstmt = con.prepareStatement(FIND_BY_USERNAME_AND_PASSWORD_SQL)
         ) {
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getPassword());
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    User user = new User();
-                    user.setUsername(rs.getString("username"));
-                    user.setPassword(rs.getString("password"));
+                    User savedUser = new User();
+                    savedUser.setUsername(rs.getString("username"));
+                    savedUser.setPassword(rs.getString("password"));
                     // Add more fields here if your User entity has more fields
-                    return Optional.of(user);
+                    return Optional.of(savedUser);
                 }
             }
         } catch (SQLException e) {

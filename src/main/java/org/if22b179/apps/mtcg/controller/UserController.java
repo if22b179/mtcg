@@ -9,6 +9,7 @@ import org.if22b179.server.http.HttpStatus;
 import org.if22b179.server.http.Request;
 import org.if22b179.server.http.Response;
 
+
 import java.util.Optional;
 
 @Data
@@ -53,15 +54,25 @@ public class UserController extends Controller{
     }
 
     private Response updateUser(Request request) {
-        System.out.println("Wieso nicht ");
+        String[] routeParts = request.getRoute().split("/");
+        if (routeParts.length < 3) {
+            return status(HttpStatus.BAD_REQUEST, "Invalid URL format");
+        }
+        String username = routeParts[2];
+
+        if (!username.equals(request.getAuthorization().substring("Bearer ".length(), request.getAuthorization().indexOf("-mtcgToken")))) {
+            return status(HttpStatus.BAD_REQUEST, "Unauthorized: Username mismatch");
+        }
+
         try {
             // Daten aus request holen
             ObjectMapper objectMapper = new ObjectMapper();
             User user = objectMapper.readValue(request.getBody(), User.class);
+            user.setUsername(username);
 
             // update bei user durchführen
             User updatedUser = userService.updateUser(user);
-            System.out.println("nach update");
+
             if (updatedUser != null) {
                 // Erstellen und Zurückgeben einer erfolgreichen Antwort
                 String updatedUserJson = objectMapper.writeValueAsString(updatedUser);
@@ -107,6 +118,12 @@ public class UserController extends Controller{
         }
         String username = routeParts[2];
 
+        String autHeader = request.getAuthorization();
+
+        if (!username.equals(autHeader.substring("Bearer ".length(), autHeader.indexOf("-mtcgToken")))) {
+            return status(HttpStatus.BAD_REQUEST, "Unauthorized: Username mismatch");
+        }
+
         // Abrufen des Benutzers über den UserService
         Optional<User> user = userService.getUser(username);
         if (user.isPresent()) {
@@ -124,4 +141,6 @@ public class UserController extends Controller{
             return status(HttpStatus.NOT_FOUND, "User not found");
         }
     }
+
+
 }
