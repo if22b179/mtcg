@@ -30,7 +30,9 @@ public class PackageController extends Controller{
 
     }
 
-    private Response handlePost(Request request) {
+    private Response handlePost(Request request) { // muss noch checken ob im headeer eh der admin geschickt wird
+        String autHeader = request.getAuthorization();
+        if(!autHeader.substring("Bearer ".length(), autHeader.indexOf("-mtcgToken")).equals("admin")) return status(HttpStatus.BAD_REQUEST,"Nicht authorisiert");
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             List<Card> cards = objectMapper.readValue(request.getBody(), new TypeReference<List<Card>>() {});
