@@ -13,7 +13,7 @@ public class UserRepo implements CrudRepo<User,String> {
 
     private final Database database = new Database();
 
-    private final String SAVE_SQL = "INSERT INTO UserTable(username, password) VALUES(?, ?)";
+    private final String SAVE_SQL = "INSERT INTO UserTable(username, password,coins,elo_value) VALUES(?, ?,?,?)";
 
     private final String DELETE_SQL = "DELETE FROM UserTable WHERE username = ?";
 
@@ -23,7 +23,7 @@ public class UserRepo implements CrudRepo<User,String> {
 
     private final String FIND_BY_USERNAME_AND_PASSWORD_SQL = "SELECT username,password FROM UserTable WHERE username = ? AND password = ?";
 
-    private final String UPDATE_COINS = "UPDATE UserTable SET virtual_coins = ? WHERE username = ?";
+    private final String UPDATE_COINS = "UPDATE UserTable SET coins = ? WHERE username = ?";
 
     @Override
     public User save(User user) {
@@ -33,6 +33,8 @@ public class UserRepo implements CrudRepo<User,String> {
         ) {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
+            pstmt.setInt(3, 20);
+            pstmt.setInt(4, 100);
 
             pstmt.execute();
             return user;
@@ -55,6 +57,8 @@ public class UserRepo implements CrudRepo<User,String> {
                     User user = new User();
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
+                    user.setCoins(rs.getInt("coins"));
+                    user.setEloValue(rs.getInt("elo_value"));
                     // Add more fields here if your User entity has more fields
                     return Optional.of(user);
                 }

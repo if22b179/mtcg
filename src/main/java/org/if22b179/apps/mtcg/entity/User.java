@@ -24,9 +24,9 @@ public class User {
     private String image;
 
     @JsonProperty("EloValue")
-    private int eloValue = 100;
+    private int eloValue;
 
     @JsonProperty("Coins")
-    private int coins = 20; // Para zum kaufen von Packs
+    private int coins; // Para zum kaufen von Packs
 
 }

@@ -4,10 +4,7 @@ import lombok.Data;
 import org.if22b179.apps.mtcg.controller.*;
 import org.if22b179.apps.mtcg.repository.CardRepo;
 import org.if22b179.apps.mtcg.repository.UserRepo;
-import org.if22b179.apps.mtcg.service.PackagesService;
-import org.if22b179.apps.mtcg.service.SessionService;
-import org.if22b179.apps.mtcg.service.TransactionService;
-import org.if22b179.apps.mtcg.service.UserService;
+import org.if22b179.apps.mtcg.service.*;
 import org.if22b179.server.ServerApplication;
 import org.if22b179.server.http.HttpContentType;
 import org.if22b179.server.http.HttpStatus;
@@ -22,7 +19,7 @@ public class MtcgApp implements ServerApplication {
     private List<Controller> controllers = new ArrayList<>();
 
     public MtcgApp() {
-        controllers.add(new TransactionController(new TransactionService(new CardRepo(),new UserRepo())));
+        controllers.add(new CardController(new CardService(new CardRepo())));
     }
 
     @Override

@@ -157,5 +157,29 @@ public class CardRepo implements CrudRepo<Card,String>{
         return cards;
     }
 
+    public List<Card> findCardsByOwner(String ownerUsername) {
+        List<Card> cards = new ArrayList<>();
+        String sql = "SELECT * FROM CardTable WHERE owner_username = ?";
 
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, ownerUsername);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Card card = new Card();
+                card.setId(rs.getString("id"));
+                card.setName(rs.getString("name"));
+                card.setDamage(rs.getDouble("damage"));
+                card.setElementType(Card.ElementType.valueOf(rs.getString("element_type")));
+                card.setCardType(Card.CardType.valueOf(rs.getString("card_type")));
+                cards.add(card);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Abrufen der Karten für Benutzer: " + ownerUsername, e);
+        }
+
+        return cards;
+    }
 }
