@@ -23,7 +23,7 @@ public class UserRepo implements CrudRepo<User,String> {
 
     private final String FIND_BY_USERNAME_AND_PASSWORD_SQL = "SELECT username,password FROM UserTable WHERE username = ? AND password = ?";
 
-
+    private final String UPDATE_COINS = "UPDATE UserTable SET virtual_coins = ? WHERE username = ?";
 
     @Override
     public User save(User user) {
@@ -124,5 +124,22 @@ public class UserRepo implements CrudRepo<User,String> {
         }
 
         return Optional.empty();
+    }
+
+    public void updateCoins(String username, int newCoinAmount) {
+
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(UPDATE_COINS)) {
+
+            pstmt.setInt(1, newCoinAmount);
+            pstmt.setString(2, username);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating coins failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Aktualisieren der Münzen in der Datenbank für Benutzer: " + username, e);
+        }
     }
 }

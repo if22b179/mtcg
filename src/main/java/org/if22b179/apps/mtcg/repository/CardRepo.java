@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CardRepo implements CrudRepo<Card,String>{
@@ -21,6 +23,7 @@ public class CardRepo implements CrudRepo<Card,String>{
 
     private final String DELETE_SQL = "DELETE FROM CardTable WHERE id = ?";
 
+    private final String FIND_ALL_CARDS_FROM_PACKAGE = "SELECT * FROM CardTable WHERE package_id = ?";
 
 
 
@@ -125,4 +128,34 @@ public class CardRepo implements CrudRepo<Card,String>{
             throw new RuntimeException("Fehler beim Abrufen der maximalen packageId", e);
         }
     }
+
+    public List<Card> findCardsByPackageId(String packageId) {
+        List<Card> cards = new ArrayList<>();
+
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(FIND_ALL_CARDS_FROM_PACKAGE)) {
+
+            pstmt.setString(1, packageId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Card card = new Card();
+                card.setId(rs.getString("id"));
+                card.setName(rs.getString("name"));
+                card.setDamage(rs.getDouble("damage"));
+                card.setElementType(Card.ElementType.valueOf(rs.getString("element_type")));
+                card.setCardType(Card.CardType.valueOf(rs.getString("card_type")));
+                card.setOwnerUsername(rs.getString("owner_username"));
+                card.setPackageId(rs.getString("package_id"));
+                card.setInDeck(rs.getBoolean("in_deck"));
+                cards.add(card);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Abrufen der Karten aus der Datenbank", e);
+        }
+
+        return cards;
+    }
+
+
 }
