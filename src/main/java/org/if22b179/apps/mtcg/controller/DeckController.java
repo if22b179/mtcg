@@ -50,7 +50,16 @@ public class DeckController extends Controller{
             ObjectMapper objectMapper = new ObjectMapper();
             String username = request.getAuthorization().substring("Bearer ".length(), request.getAuthorization().indexOf("-mtcgToken"));
             List<Card> deck = deckService.getDeck(username);
-            String jsonResponse = objectMapper.writeValueAsString(deck);
+
+            StringBuilder jsonResponseBuilder = new StringBuilder();
+            for (Card card : deck) {
+                jsonResponseBuilder.append("Name: ").append(card.getName())
+                        .append(", Damage: ").append(card.getDamage())
+                        .append("\n"); // Für jede Karte eine neue Zeile
+            }
+
+            String jsonResponse = jsonResponseBuilder.toString();
+
             return status(HttpStatus.OK, jsonResponse);
         } catch (Exception e) {
             return status(HttpStatus.BAD_REQUEST, "Ein Fehler ist aufgetreten: " + e.getMessage());

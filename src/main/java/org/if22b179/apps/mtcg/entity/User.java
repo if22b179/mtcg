@@ -29,4 +29,8 @@ public class User {
     @JsonProperty("Coins")
     private int coins; // Para zum kaufen von Packs
 
+    private int wins;
+
+    private int loss;
+
 }

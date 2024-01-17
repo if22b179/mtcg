@@ -13,7 +13,7 @@ public class UserRepo implements CrudRepo<User,String> {
 
     private final Database database = new Database();
 
-    private final String SAVE_SQL = "INSERT INTO UserTable(username, password,coins,elo_value) VALUES(?, ?,?,?)";
+    private final String SAVE_SQL = "INSERT INTO UserTable(username, password,coins,elo_value,wins,loss) VALUES(?, ?,?,?,?,?)";
 
     private final String DELETE_SQL = "DELETE FROM UserTable WHERE username = ?";
 
@@ -25,6 +25,8 @@ public class UserRepo implements CrudRepo<User,String> {
 
     private final String UPDATE_COINS = "UPDATE UserTable SET coins = ? WHERE username = ?";
 
+    private final String CHANGE_ELO = "UPDATE UserTable SET elo_value = ? WHERE username = ?";
+
     @Override
     public User save(User user) {
         try (
@@ -35,6 +37,8 @@ public class UserRepo implements CrudRepo<User,String> {
             pstmt.setString(2, user.getPassword());
             pstmt.setInt(3, 20);
             pstmt.setInt(4, 100);
+            pstmt.setInt(5, 0);
+            pstmt.setInt(6, 0);
 
             pstmt.execute();
             return user;
@@ -59,6 +63,8 @@ public class UserRepo implements CrudRepo<User,String> {
                     user.setPassword(rs.getString("password"));
                     user.setCoins(rs.getInt("coins"));
                     user.setEloValue(rs.getInt("elo_value"));
+                    user.setWins(rs.getInt("wins"));
+                    user.setLoss(rs.getInt("loss"));
                     // Add more fields here if your User entity has more fields
                     return Optional.of(user);
                 }
@@ -144,6 +150,55 @@ public class UserRepo implements CrudRepo<User,String> {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Fehler beim Aktualisieren der Münzen in der Datenbank für Benutzer: " + username, e);
+        }
+    }
+
+    public void changeElo(String username, int elo){
+
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(CHANGE_ELO)) {
+
+            pstmt.setInt(1, elo);
+            pstmt.setString(2, username);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating elo failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Aktualisieren der Elo in der Datenbank für Benutzer: " + username, e);
+        }
+    }
+
+    public void win(String name){
+        String sql = "UPDATE UserTable SET wins = wins +1 WHERE username = ?";
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating wins failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Aktualisieren der Wins in der Datenbank für Benutzer: " + name, e);
+        }
+    }
+
+    public void loss(String name){
+        String sql = "UPDATE UserTable SET loss = loss +1 WHERE username = ?";
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating loss failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Aktualisieren der loss in der Datenbank für Benutzer: " + name, e);
         }
     }
 }

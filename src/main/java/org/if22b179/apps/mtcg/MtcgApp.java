@@ -19,7 +19,13 @@ public class MtcgApp implements ServerApplication {
     private List<Controller> controllers = new ArrayList<>();
 
     public MtcgApp() {
+        controllers.add(new BattleController(new BattleService(new CardRepo(),new UserRepo())));
+        controllers.add(new CardController(new CardService(new CardRepo())));
         controllers.add(new DeckController(new DeckService(new CardRepo())));
+        controllers.add(new PackageController(new PackagesService(new CardRepo())));
+        controllers.add(new SessionController(new SessionService(new UserRepo())));
+        controllers.add(new TransactionController(new TransactionService(new CardRepo(),new UserRepo())));
+        controllers.add(new UserController(new UserService(new UserRepo())));
     }
 
     @Override
