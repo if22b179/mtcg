@@ -25,6 +25,11 @@ public class CardRepo implements CrudRepo<Card,String>{
 
     private final String FIND_ALL_CARDS_FROM_PACKAGE = "SELECT * FROM CardTable WHERE package_id = ?";
 
+    private final String UPDATE_CARD_DECK = "UPDATE CardTable SET in_deck = true WHERE owner_username = ? AND id = ?";
+
+    private final String GET_DECK = "SELECT * FROM CardTable WHERE owner_username = ? AND in_deck = true";
+
+
 
 
     @Override
@@ -182,4 +187,42 @@ public class CardRepo implements CrudRepo<Card,String>{
 
         return cards;
     }
+
+    public void updateDeck(String userId, List<String> cardIds) {
+
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(UPDATE_CARD_DECK))
+        {
+            for (String cardId : cardIds) {
+                pstmt.setString(1, userId);
+                pstmt.setString(2, cardId);
+                pstmt.executeUpdate();
+            }
+        }catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Updaten der Karten in der Datenbank", e);
+        }
+    }
+
+    public List<Card> getDeck(String userId) {
+        List<Card> cards = new ArrayList<>();
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(GET_DECK))
+        {
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery() ;
+            while (rs.next()) {
+                Card card = new Card();
+                card.setId(rs.getString("id"));
+                card.setName(rs.getString("name"));
+                card.setDamage(rs.getDouble("damage"));
+               // card.setElementType(Card.ElementType.valueOf(rs.getString("element_type")));
+                //card.setCardType(Card.CardType.valueOf(rs.getString("card_type")));
+                cards.add(card);
+            }
+        }catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Abrufen des Decks aus der Datenbank", e);
+        }
+        return cards;
+    }
 }
+
