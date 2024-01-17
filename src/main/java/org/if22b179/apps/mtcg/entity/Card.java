@@ -1,6 +1,7 @@
 package org.if22b179.apps.mtcg.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

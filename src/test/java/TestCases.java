@@ -8,6 +8,7 @@ import org.if22b179.apps.mtcg.service.UserService;
 import org.if22b179.server.http.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,6 +17,39 @@ public class TestCases {
     ///////////////////////////////////////////////////////////////////////////////////////
     //                                   Repo Tests
     ///////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    void increaseUserCoins() {
+        UserRepo userRepo = new UserRepo();
+        userRepo.updateCoins("altenhof", 5);
+        Optional<User> user = userRepo.findById("altenhof");
+
+        assertEquals(5, user.get().getCoins(), "Münzen sollten nach bearbeitung 5 betragen");
+    }
+
+    @Test
+    void decreaseUserCoinsOnPurchase() {
+        UserRepo userRepo = new UserRepo();
+        userRepo.updateCoins("altenhof", -5);
+        Optional<User> user = userRepo.findById("altenhof");
+
+        assertEquals(-5, user.get().getCoins(), "Münzen sollten nach der bearbeitung -5 betragen");
+    }
+    @Test
+    void findUser() {
+        UserRepo userRepo = new UserRepo();
+        Optional<User> user = userRepo.findById("altenhof");
+
+        assertTrue(user.isPresent(), "User sollte vorhanden sein mit richtigen Anmeldeinformationen");
+    }
+
+    @Test
+    void failFindUser() {
+        UserRepo userRepo = new UserRepo();
+        Optional<User> user = userRepo.findById("nicht drinnen ");
+
+        assertFalse(user.isPresent(), "User sollte nicht vorhanden sein mit falschen Anmeldeinformationen");
+    }
     @Test
     void saveUserInDB() {
         User user = new User();
@@ -177,12 +211,50 @@ public class TestCases {
 
     @Test
     void cardDel(){
-
         CardRepo cardRepo = new CardRepo();
         cardRepo.deleteById("1");
         Optional<Card> card = cardRepo.findById("1");
         assertNull(card, "Usser sollte null sein ");
 
+    }
+
+    @Test
+    void cardSaveFailureWithNullCard() {
+        Card card = null; // Versuch, ein null-Objekt zu speichern
+
+        CardRepo cardRepo = new CardRepo();
+        assertThrows(RuntimeException.class, () -> cardRepo.save(card), "Sollte eine Exception werfen, wenn eine null-Karte gespeichert wird");
+    }
+
+    @Test
+    void cardFindNonExistent() {
+        CardRepo cardRepo = new CardRepo();
+        String nonExistentCardId = "nonExistentId";
+        Optional<Card> nonExistentCard = cardRepo.findById(nonExistentCardId);
+
+        assertFalse(nonExistentCard.isPresent(), "Sollte false sein, da die Karte nicht existiert");
+    }
+
+    @Test
+    void cardSaveDuplicate() {
+        Card card = new Card();
+        card.setId("duplicateCardId"); // ID, die bereits in der Datenbank existiert
+        card.setName("Goblin");
+        card.setDamage(10.0);
+
+        CardRepo cardRepo = new CardRepo();
+        assertThrows(RuntimeException.class, () -> cardRepo.save(card), "Sollte eine Exception werfen, wenn eine Karte mit doppelter ID gespeichert wird");
+    }
+
+    @Test
+    void cardDeleteButKeepInRepo() {
+        CardRepo cardRepo = new CardRepo();
+        String cardIdToDelete = "existingCardId";
+        cardRepo.deleteById(cardIdToDelete);
+
+        // Versuch, die Karte zu löschen, aber prüfe, ob sie immer noch vorhanden ist (das sollte nicht passieren)
+        Optional<Card> cardStillExists = cardRepo.findById(cardIdToDelete);
+        assertTrue(cardStillExists.isPresent(), "Karte sollte nicht vorhanden sein nach dem Löschen");
     }
 }
 
