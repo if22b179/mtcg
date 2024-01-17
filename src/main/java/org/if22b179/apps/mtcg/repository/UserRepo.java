@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UserRepo implements CrudRepo<User,String> {
@@ -26,6 +28,8 @@ public class UserRepo implements CrudRepo<User,String> {
     private final String UPDATE_COINS = "UPDATE UserTable SET coins = ? WHERE username = ?";
 
     private final String CHANGE_ELO = "UPDATE UserTable SET elo_value = ? WHERE username = ?";
+
+    private final String GET_ALL_ELO = "SELECT * FROM Usertable ORDER BY elo_value";
 
     @Override
     public User save(User user) {
@@ -200,5 +204,30 @@ public class UserRepo implements CrudRepo<User,String> {
         } catch (SQLException e) {
             throw new RuntimeException("Fehler beim Aktualisieren der loss in der Datenbank für Benutzer: " + name, e);
         }
+    }
+
+    public List<User> getAllElo() {
+        List<User> users = new ArrayList<>();
+
+        try (Connection conn = database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(GET_ALL_ELO);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                User user = new User();
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setCoins(rs.getInt("coins"));
+                user.setEloValue(rs.getInt("elo_value"));
+                user.setWins(rs.getInt("wins"));
+                user.setLoss(rs.getInt("loss"));
+
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Abrufen der Benutzer aus der Datenbank", e);
+        }
+
+        return users;
     }
 }
